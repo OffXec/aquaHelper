@@ -1,13 +1,70 @@
 #!/usr/bin/env bash
 
 #text colors:
-none="\033[0m"
-red="\033[31;40m"
+red='\e[1;31m'
+w='\e[0;38m'
+none='\e[0m'
 #------------------------
-tcount=0
-threading="--threads $tcount"
+threading="--threads ${2}"
 #Aquatone-takover helper; By OffXec.
 #Lazybones coding ;P.
+function menu()
+{
+echo "--------------------------------------------------"
+echo -e "All scans finished, choose to view or exit."
+select UI in "View sub-domains" "View open ports" "View URLs" "View TakeOvers" "Exit"
+do
+	case $UI in
+		"View sub-domains")
+			#passive_menu
+		;;
+	        "View open ports")
+			#ag_menu			
+		;;
+		"View URLs")
+			#vuln_menu
+		;;
+		"View TakeOvers")
+			#exploitHub
+		;;
+		"Exit")
+			exit 0
+		;;
+		*)
+			echo -e "Lel, really? Try again"
+			menu
+		;;
+	esac
+	break
+done < /dev/tty
+}
+clear;echo
+cat<<"EOT"
+                     _..-----._
+                   .'          '.
+                  /              \
+                 |                ;
+                 |                 |
+                 \                 |
+                  \               ;
+            _..----'             /
+          .`-. .-'``'-.       .-'
+        .'_   `  _     '.    `'.
+       /  _`    _ `      \      \     _...._
+    _  | /  \  /  \      |       | .-'      `'.
+   / \ | | /|  | /|      |       ;'            \
+  |  |_\ \_|/  \_|/      /                      ;
+  .\_/  `'-.            /_...._                 |
+ /          `                  `\               |
+ |                        __     |             /
+  \                       / `   //'.         .'
+   '._                  .'     .'   `'-...-'`
+      `"'-.,__    ___.-'    .-'
+          `-._````  __..--'`
+              ``````
+	      usage: bash aqua.sh domain.com (threads optional)
+EOT
+menu
 
 if [[ "$1" == "help" ]]; then
 	echo "USAGE: bash "$0" target.com THREADS"
@@ -20,24 +77,24 @@ if [[ "$1" -eq 0 ]]; then
 fi
 if [[ "$2" -eq 0 ]]; then
 	echo "No threads set. Using single/default threading!"
-	tcount=10
+	threading="--threads 10"
 else
-	tcount="$2"
+	threading="$2"
 	echo "Thread count set to "$2". Starting proccess."	
 fi
 SECONDS=0
 echo -e "Mode:" $red" DISCOVER"$none"("$red" Enumerating sub-domains"$none")"
-(aquatone-discover --domain "${1}" threading)
-
+(aquatone-discover --domain "${1}" "$threading")
+clear;echo
 sleep 1
 echo -e "Next Mode:"$red" SCANNING"$none
-
+clear;echo
 echo -e "-Enumerating open ports from our"$red" discovered"$none" hosts."
-(aquatone-scan --domain "${1}" --ports large threading) 
+(aquatone-scan --domain "${1}" --ports large "$threading") 
 sleep 1
-
+clear;echo
 echo -e "Final Mode:"$red" GATHERING"$none"("$red" Gathering HTTP-Screenshots, etc."$none")"
-(aquatone-gather --domain "${1}" threading)
+(aquatone-gather --domain "${1}" "$threading")
 sleep 1
 if [[ $? -ne 1 ]]; then
 	clear
