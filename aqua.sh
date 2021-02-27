@@ -4,9 +4,11 @@
 none="\033[0m"
 red="\033[31;40m"
 #------------------------
-threading="--threads ${2}"
+tcount=0
+threading="--threads $tcount"
 #Aquatone-takover helper; By OffXec.
 #Lazybones coding ;P.
+
 if [[ "$1" == "help" ]]; then
 	echo "USAGE: bash "$0" target.com THREADS"
 	exit 0
@@ -18,24 +20,24 @@ if [[ "$1" -eq 0 ]]; then
 fi
 if [[ "$2" -eq 0 ]]; then
 	echo "No threads set. Using single/default threading!"
-	threading="--threads 10"
+	tcount=10
 else
-	threading="$2"
+	tcount="$2"
 	echo "Thread count set to "$2". Starting proccess."	
 fi
 SECONDS=0
 echo -e "Mode:" $red" DISCOVER"$none"("$red" Enumerating sub-domains"$none")"
-(aquatone-discover --domain "${1}" "$threading")
-clear;echo
+(aquatone-discover --domain "${1}" threading)
+
 sleep 1
 echo -e "Next Mode:"$red" SCANNING"$none
-clear;echo
+
 echo -e "-Enumerating open ports from our"$red" discovered"$none" hosts."
-(aquatone-scan --domain "${1}" --ports large "$threading") 
+(aquatone-scan --domain "${1}" --ports large threading) 
 sleep 1
-clear;echo
+
 echo -e "Final Mode:"$red" GATHERING"$none"("$red" Gathering HTTP-Screenshots, etc."$none")"
-(aquatone-gather --domain "${1}" "$threading")
+(aquatone-gather --domain "${1}" threading)
 sleep 1
 if [[ $? -ne 1 ]]; then
 	clear
